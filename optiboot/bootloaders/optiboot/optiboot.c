@@ -166,6 +166,9 @@
 #  define LED_START_ON 0
 #endif
 
+#if !defined(USE_RS485)
+#define USE_RS485 0
+#endif
 
 /**********************************************************/
 /* Version Numbers!                                       */
@@ -452,8 +455,14 @@ typedef uint8_t pagelen_t;
 void pre_main(void) __attribute__ ((naked)) __attribute__ ((section (".init8")));
 int main(void) __attribute__ ((OS_main)) __attribute__ ((section (".init9"))) __attribute__((used));
 
+#if USE_RS485
+void __attribute__((noinline)) __attribute__((leaf)) _putch(char);
+uint8_t __attribute__((noinline)) __attribute__((leaf)) _getch(void) ;
+#endif
+
 void __attribute__((noinline)) __attribute__((leaf)) putch(char);
 uint8_t __attribute__((noinline)) __attribute__((leaf)) getch(void) ;
+
 void __attribute__((noinline)) verifySpace();
 void __attribute__((noinline)) watchdogConfig(uint8_t x);
 
@@ -576,10 +585,25 @@ void pre_main(void) {
 }
 
 
+#if USE_RS485 
+  uint8_t packet[255];
+  #define STK500_START_DATA_POSITION  3;
+  uint8_t stk500_rx_data_pos = STK500_START_DATA_POSITION;
+  uint8_t stk500_tx_data_pos = STK500_START_DATA_POSITION;
+//#define STK500_DATA_MAX_LEN (255 - sizeof(cobs_packet_t)/sizeof(uint8_t))
+#endif
+
 /* main program starts here */
 int main(void) {
-  uint8_t ch;
-
+	  
+  uint8_t ch;  
+  
+ #if USE_RS485
+ 	uint8_t packet_byte_cnt = 0;
+ 	uint8_t next_zero_location = 0;
+ 	uint8_t crc8 = 0;
+#endif 
+  
   /*
    * Making these local and in registers prevents the need for initializing
    * them, and also saves space because code no longer stores to memory.
@@ -755,8 +779,58 @@ int main(void) {
 #endif
 #endif
 
+
+#if USE_RS485
+l_wait_for_new_packet:	
+	packet_byte_cnt = 0;
+	next_zero_location = 0;	
+	packet[0] = _getch();
+	crc8 = 0;
+	next_zero_location = packet[0];
+	packet_byte_cnt++;	
+	
+	if(packet[0] == 0x00 || packet[0] == 0x01 || packet[0] == 0xFF) goto l_wait_for_new_packet;
+
+	for (;;)
+	{  
+		packet[packet_byte_cnt] = _getch();		
+	  
+		if(packet[packet_byte_cnt] == 0x00) // received End of COBS packet
+		{
+			if(next_zero_location == packet_byte_cnt ) 
+			{
+				if(crc8-packet[packet_byte_cnt-1] == packet[packet_byte_cnt-1]) // crc8 is OK
+				{
+					if(1/*Check address!!!!!*/) goto l_prepare_stk500; // if address is right -> handle STK500
+				}
+				else goto l_wait_for_new_packet; // something went wrong
+			}
+			else goto l_wait_for_new_packet; // something went wrong
+		}
+	  
+		if(packet_byte_cnt == next_zero_location)
+		{
+			next_zero_location = packet_byte_cnt + packet[packet_byte_cnt];
+			packet[packet_byte_cnt] = 0x00; // Replace 0x00 to restore real value		  
+		}	  
+	  
+		if(packet_byte_cnt == 0xFF) goto l_wait_for_new_packet; // something went wrong
+		
+		crc8 += packet[packet_byte_cnt];
+		packet_byte_cnt++;
+		_putch(packet_byte_cnt);
+	}
+#endif
+
   /* Forever loop: exits by causing WDT reset */
   for (;;) {
+	  
+#if USE_RS485
+l_prepare_stk500:
+stk500_rx_data_pos = STK500_START_DATA_POSITION;
+stk500_tx_data_pos = STK500_START_DATA_POSITION;
+#endif	  
+	  
     /* get character from UART */
     ch = getch();
 
@@ -1005,11 +1079,43 @@ int main(void) {
       // This covers the response to commands like STK_ENTER_PROGMODE
       verifySpace();
     }
-    putch(STK_OK);
+	putch(STK_OK);
+	
+#if USE_RS485
+	uint8_t _crc8 = 0;	
+	for (uint8_t i=1; i<stk500_tx_data_pos; i++) // calculate CRC8
+	{
+		_crc8 += packet[i];
+	}
+	putch(_crc8);
+	putch(0x00);
+	
+	uint8_t _zero_pos = stk500_tx_data_pos - 1;
+	packet[0] = 0x00;
+	for(int16_t i=_zero_pos-1; i>=0; i--) // replace 0x00 (exclude last one) to make right COBS packet
+	{
+		if(packet[i] == 0x00)
+		{
+			packet[i] = _zero_pos - i; 
+			_zero_pos = i;
+		}
+	}	
+	for(uint8_t i=0; i<stk500_tx_data_pos; i++) // send packet
+	{
+		_putch(packet[i]);		
+	}
+	goto l_wait_for_new_packet;
+#endif
   }
 }
 
+
+#if USE_RS485
+void _putch(char ch) {
+#else
 void putch(char ch) {
+#endif
+	
 #if (SOFT_UART == 0)
   #ifndef LIN_UART
     while (!(UART_SRA & _BV(UDRE0))) {  /* Spin */ }
@@ -1045,7 +1151,20 @@ void putch(char ch) {
 #endif
 }
 
+#if USE_RS485
+void putch(char ch) {
+	packet[stk500_tx_data_pos] = ch;
+	stk500_tx_data_pos++;
+}
+#endif
+
+
+#if USE_RS485
+uint8_t _getch(void) {
+#else
 uint8_t getch(void) {
+#endif
+		
   uint8_t ch;
 
 #if LED_DATA_FLASH
@@ -1119,6 +1238,15 @@ uint8_t getch(void) {
 
   return ch;
 }
+
+#if USE_RS485
+uint8_t getch(void) {
+	uint8_t res = packet[stk500_rx_data_pos];	
+	stk500_rx_data_pos++;
+	return res;
+}
+#endif
+
 
 #if SOFT_UART
 // AVR305 equation: #define UART_B_VALUE (((F_CPU/BAUD_RATE)-23)/6)
