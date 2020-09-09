@@ -249,11 +249,30 @@ OSCCAL_VALUE_CMD = -DOSCCAL_VALUE=$(OSCCAL_VALUE)
 dummy = FORCE
 endif
 
+HELPTEXT += "Option USE_RS485=1           - Include code to use RS485 (require to set direction pin)\n"
+ifdef USE_RS485
+ifneq ($(USE_RS485), 0)
+USE_RS485_CMD = -DUSE_RS485=1
+endif
+endif
+
+HELPTEXT += "Option RS485_DIR=B3           - set RS485 direction pin to particular port/bit\n"
+ifdef RS485_DIR
+RS485_DIR_CMD = -DRS485_DIR=$(RS485_DIR)
+dummy = FORCE
+endif
+
+HELPTEXT += "Option RS485_ADDR_LOC=0x00    - set RS485 device address location in Eeprom (address is 2 byte)\n"
+ifdef RS485_ADDR_LOC
+RS485_ADDR_LOC_CMD = -DRS485_ADDR_LOC=$(RS485_ADDR_LOC)
+dummy = FORCE
+endif
 
 COMMON_OPTIONS = $(BAUD_RATE_CMD) $(LED_START_FLASHES_CMD) $(BIGBOOT_CMD)
 COMMON_OPTIONS += $(SOFT_UART_CMD) $(LED_DATA_FLASH_CMD) $(LED_CMD) $(SS_CMD)
 COMMON_OPTIONS += $(SUPPORT_EEPROM_CMD) $(LED_START_ON_CMD) $(APPSPM_CMD)
 COMMON_OPTIONS += $(OSCCAL_VALUE_CMD) $(VERSION_CMD) $(TIMEOUT_CMD)
+COMMON_OPTIONS += $(USE_RS485_CMD) $(RS485_DIR_CMD) $(RS485_ADDR_LOC_CMD)
 
 #UART is handled separately and only passed for devices with more than one.
 HELPTEXT += "Option UART=n                - use UARTn for communications\n"
