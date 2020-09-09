@@ -132,6 +132,8 @@
 /*                                                        */
 /**********************************************************/
 
+
+
 /*
  * default values.
  */
@@ -169,6 +171,11 @@
 #if !defined(USE_RS485)
 #define USE_RS485 0
 #endif
+
+#if !defined(RS485_ADDR_LOC)
+#define RS485_ADDR_LOC 0x00
+#endif
+
 
 /**********************************************************/
 /* Version Numbers!                                       */
@@ -781,6 +788,12 @@ int main(void) {
 
 
 #if USE_RS485
+	/* Set RS485_DIR pin as output */
+	RS485_DIR_DDR |= _BV(RS485_DIR);
+
+	uint8_t ee_address_h = eeprom_read_byte((uint8_t*)RS485_ADDR_LOC);
+	uint8_t ee_address_l = eeprom_read_byte((uint8_t*)(RS485_ADDR_LOC+1));
+
 l_wait_for_new_packet:	
 	packet_byte_cnt = 0;
 	next_zero_location = 0;	
@@ -789,7 +802,7 @@ l_wait_for_new_packet:
 	next_zero_location = packet[0];
 	packet_byte_cnt++;	
 	
-	if(packet[0] == 0x00 || packet[0] == 0x01 || packet[0] == 0xFF) goto l_wait_for_new_packet;
+	if(packet[0] == 0x00 || packet[0] == 0xFF) goto l_wait_for_new_packet;
 
 	for (;;)
 	{  
@@ -801,7 +814,7 @@ l_wait_for_new_packet:
 			{
 				if(crc8-packet[packet_byte_cnt-1] == packet[packet_byte_cnt-1]) // crc8 is OK
 				{
-					if(1/*Check address!!!!!*/) goto l_prepare_stk500; // if address is right -> handle STK500
+					if(packet[1]==ee_address_h && packet[2]==ee_address_l) goto l_prepare_stk500; // if address is right -> handle STK500
 				}
 				else goto l_wait_for_new_packet; // something went wrong
 			}
@@ -818,7 +831,6 @@ l_wait_for_new_packet:
 		
 		crc8 += packet[packet_byte_cnt];
 		packet_byte_cnt++;
-		_putch(packet_byte_cnt);
 	}
 #endif
 
@@ -1089,21 +1101,25 @@ stk500_tx_data_pos = STK500_START_DATA_POSITION;
 	}
 	putch(_crc8);
 	putch(0x00);
-	
 	uint8_t _zero_pos = stk500_tx_data_pos - 1;
 	packet[0] = 0x00;
 	for(int16_t i=_zero_pos-1; i>=0; i--) // replace 0x00 (exclude last one) to make right COBS packet
 	{
 		if(packet[i] == 0x00)
 		{
-			packet[i] = _zero_pos - i; 
+			packet[i] = _zero_pos - i;
 			_zero_pos = i;
 		}
 	}	
+
+	/* Turn on RS485_DIR to start transmitting */
+	RS485_DIR_PORT |= _BV(RS485_DIR);
 	for(uint8_t i=0; i<stk500_tx_data_pos; i++) // send packet
 	{
 		_putch(packet[i]);		
 	}
+	/* Turn off RS485_DIR */
+	RS485_DIR_PORT &=~_BV(RS485_DIR);
 	goto l_wait_for_new_packet;
 #endif
   }
@@ -1204,13 +1220,13 @@ uint8_t getch(void) {
       "r25"
 );
 #else
-#ifndef LIN_UART
-  while(!(UART_SRA & _BV(RXC0)))  {  /* Spin */ }
-  if (!(UART_SRA & _BV(FE0))) {
-#else
-  while(!(LINSIR & _BV(LRXOK)))  {  /* Spin */ }
-  if (!(LINSIR & _BV(LFERR))) {
-#endif
+	#ifndef LIN_UART
+	  while(!(UART_SRA & _BV(RXC0)))  {  /* Spin */ }
+	  if (!(UART_SRA & _BV(FE0))) {
+	#else
+	  while(!(LINSIR & _BV(LRXOK)))  {  /* Spin */ }
+	  if (!(LINSIR & _BV(LFERR))) {
+	#endif
       /*
        * A Framing Error indicates (probably) that something is talking
        * to us at the wrong bit rate.  Assume that this is because it
@@ -1219,10 +1235,9 @@ uint8_t getch(void) {
        * the application "soon", if it keeps happening.  (Note that we
        * don't care that an invalid char is returned...)
        */
-    watchdogReset();
-  }
-
-  ch = UART_UDR;
+		watchdogReset();
+	  }
+	ch = UART_UDR;	
 #endif
 
 #if LED_DATA_FLASH
