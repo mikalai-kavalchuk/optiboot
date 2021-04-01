@@ -1,0 +1,1 @@
+make atmega328 BAUD_RATE=9600 USE_RS485=1 RS485_DIR=B5 BIGBOOT=0 LDSECTIONS="-Wl,--section-start=.text=0x7c00 -Wl,--section-start=.version=0x7ffe"

@@ -314,7 +314,6 @@
 
 unsigned const int __attribute__((section(".version"))) 
 optiboot_version = 256*(OPTIBOOT_MAJVER + OPTIBOOT_CUSTOMVER) + OPTIBOOT_MINVER;
-
 
 #include <inttypes.h>
 #include <avr/io.h>
@@ -592,12 +591,11 @@ void pre_main(void) {
 }
 
 
-#if USE_RS485 
-  uint8_t packet[255];
+#if USE_RS485   
   #define STK500_START_DATA_POSITION  3;
+  uint8_t packet[255];
   uint8_t stk500_rx_data_pos = STK500_START_DATA_POSITION;
   uint8_t stk500_tx_data_pos = STK500_START_DATA_POSITION;
-//#define STK500_DATA_MAX_LEN (255 - sizeof(cobs_packet_t)/sizeof(uint8_t))
 #endif
 
 /* main program starts here */
@@ -640,6 +638,31 @@ int main(void) {
 
 #if defined(OSCCAL_VALUE)
   OSCCAL = OSCCAL_VALUE;
+#endif
+
+#if USE_RS485 // TODO: Add check for FLASH integrity
+//#define BOOT_START 0x7C00
+/************************************************************************/
+/* Check FLASH integrity                                                */
+/************************************************************************/
+/*
+uint8_t crc_calculated = 0;
+uint16_t addr = 0;
+for (; addr<FLASHEND-BOOT_START-1;addr++)
+{
+#ifdef RAMPZ
+	crc_calculated += pgm_read_byte_far((uint16_t *)addr);
+#else
+	crc_calculated += pgm_read_byte_near((uint16_t *)addr);	
+#endif
+}
+
+#ifdef RAMPZ
+if(crc_calculated == pgm_read_byte_far((uint16_t *)addr))
+#else
+//
+#endif
+*/
 #endif
 
   /*

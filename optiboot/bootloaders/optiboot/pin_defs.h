@@ -1533,3 +1533,737 @@
 #pragma GCC diagnostic warning "-Wfatal-errors"
 #error Unrecognized LED name.  Should be like "B5"
 #endif
+
+/*
+ * ------------------------------------------------------------------------
+ * A bunch of macros to enable the RS485_DIR to be specifed as "B5" for bit 5 
+ * of port B, and similar.
+ * We define symbols for all the legal combination of port/bit on a chip,
+ * and do pre-processor tests to see if there's a match.  This ends up
+ * being very verbose, but it is pretty easy to generate semi-automatically.
+ * (We wouldn't need this if the preprocessor could do string compares.)
+ */
+
+// If there is no PORTA on this chip, don't allow these to be used
+//   (and indicate the error by redefining RS485_DIR)
+#if !defined(PORTA)
+#if RS485_DIR >= A0 && RS485_DIR <= A7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !defined(PORTB)
+#if RS485_DIR >= B0 && RS485_DIR <= B7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTC))
+#if RS485_DIR >= C0 && RS485_DIR <= C7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTD))
+#if RS485_DIR >= D0 && RS485_DIR <= D7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTE))
+#if RS485_DIR >= E0 && RS485_DIR <= E7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTF))
+#if RS485_DIR >= F0 && RS485_DIR <= F7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !defined(PORTG)
+#if RS485_DIR >= G0 && RS485_DIR <= G7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTH))
+#if RS485_DIR >= H0 && RS485_DIR <= H7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTJ))
+#if RS485_DIR >= J0 && RS485_DIR <= J7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTK))
+#if RS485_DIR >= K0 && RS485_DIR <= K7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+#if !(defined(PORTL))
+#if RS485_DIR >= L0 && RS485_DIR <= L7
+#undef RS485_DIR
+#define RS485_DIR -1
+#endif
+#endif
+
+
+/*
+ * A statement like "#if RS485_DIR == B0" will evaluation (in the preprocessor)
+ * to #if C0 == B0, and then to #if 0x301 == 0x201
+ */
+#if RS485_DIR == B0
+#define RS485_DIR_NAME "B0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB0
+#elif RS485_DIR == B1
+#define RS485_DIR_NAME "B1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB1
+#elif RS485_DIR == B2
+#define RS485_DIR_NAME "B2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB2
+#elif RS485_DIR == B3
+#define RS485_DIR_NAME "B3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB3
+#elif RS485_DIR == B4
+#define RS485_DIR_NAME "B4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB4
+#elif RS485_DIR == B5
+#define RS485_DIR_NAME "B5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB5
+#elif RS485_DIR == B6
+#define RS485_DIR_NAME "B6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB6
+#elif RS485_DIR == B7
+#define RS485_DIR_NAME "B7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRB
+#define RS485_DIR_PORT    PORTB
+#define RS485_DIR_PIN     PINB
+#define RS485_DIR	    PINB7
+
+#elif RS485_DIR == C0
+#define RS485_DIR_NAME "C0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC0
+#elif RS485_DIR == C1
+#define RS485_DIR_NAME "C1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC1
+#elif RS485_DIR == C2
+#define RS485_DIR_NAME "C2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC2
+#elif RS485_DIR == C3
+#define RS485_DIR_NAME "C3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC3
+#elif RS485_DIR == C4
+#define RS485_DIR_NAME "C4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC4
+#elif RS485_DIR == C5
+#define RS485_DIR_NAME "C5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC5
+#elif RS485_DIR == C6
+#define RS485_DIR_NAME "C6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC6
+#elif RS485_DIR == C7
+#define RS485_DIR_NAME "C7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRC
+#define RS485_DIR_PORT    PORTC
+#define RS485_DIR_PIN     PINC
+#define RS485_DIR	    PINC7
+
+#elif RS485_DIR == D0
+#define RS485_DIR_NAME "D0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND0
+#elif RS485_DIR == D1
+#define RS485_DIR_NAME "D1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND1
+#elif RS485_DIR == D2
+#define RS485_DIR_NAME "D2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND2
+#elif RS485_DIR == D3
+#define RS485_DIR_NAME "D3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND3
+#elif RS485_DIR == D4
+#define RS485_DIR_NAME "D4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND4
+#elif RS485_DIR == D5
+#define RS485_DIR_NAME "D5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND5
+#elif RS485_DIR == D6
+#define RS485_DIR_NAME "D6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND6
+#elif RS485_DIR == D7
+#define RS485_DIR_NAME "D7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRD
+#define RS485_DIR_PORT    PORTD
+#define RS485_DIR_PIN     PIND
+#define RS485_DIR	    PIND7
+
+#elif RS485_DIR == E0
+#define RS485_DIR_NAME "E0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE0
+#elif RS485_DIR == E1
+#define RS485_DIR_NAME "E1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE1
+#elif RS485_DIR == E2
+#define RS485_DIR_NAME "E2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE2
+#elif RS485_DIR == E3
+#define RS485_DIR_NAME "E3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE3
+#elif RS485_DIR == E4
+#define RS485_DIR_NAME "E4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE4
+#elif RS485_DIR == E5
+#define RS485_DIR_NAME "E5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE5
+#elif RS485_DIR == E6
+#define RS485_DIR_NAME "E6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE6
+#elif RS485_DIR == E7
+#define RS485_DIR_NAME "E7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRE
+#define RS485_DIR_PORT    PORTE
+#define RS485_DIR_PIN     PINE
+#define RS485_DIR	    PINE7
+
+#elif RS485_DIR == F0
+#define RS485_DIR_NAME "F0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF0
+#elif RS485_DIR == F1
+#define RS485_DIR_NAME "F1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF1
+#elif RS485_DIR == F2
+#define RS485_DIR_NAME "F2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF2
+#elif RS485_DIR == F3
+#define RS485_DIR_NAME "F3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF3
+#elif RS485_DIR == F4
+#define RS485_DIR_NAME "F4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF4
+#elif RS485_DIR == F5
+#define RS485_DIR_NAME "F5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF5
+#elif RS485_DIR == F6
+#define RS485_DIR_NAME "F6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF6
+#elif RS485_DIR == F7
+#define RS485_DIR_NAME "F7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRF
+#define RS485_DIR_PORT    PORTF
+#define RS485_DIR_PIN     PINF
+#define RS485_DIR	    PINF7
+
+#elif RS485_DIR == G0
+#define RS485_DIR_NAME "G0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING0
+#elif RS485_DIR == G1
+#define RS485_DIR_NAME "G1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING1
+#elif RS485_DIR == G2
+#define RS485_DIR_NAME "G2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING2
+#elif RS485_DIR == G3
+#define RS485_DIR_NAME "G3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING3
+#elif RS485_DIR == G4
+#define RS485_DIR_NAME "G4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING4
+#elif RS485_DIR == G5
+#define RS485_DIR_NAME "G5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING5
+#elif RS485_DIR == G6
+#define RS485_DIR_NAME "G6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING6
+#elif RS485_DIR == G7
+#define RS485_DIR_NAME "G7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRG
+#define RS485_DIR_PORT    PORTG
+#define RS485_DIR_PIN     PING
+#define RS485_DIR	    PING7
+
+#elif RS485_DIR == H0
+#define RS485_DIR_NAME "H0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH0
+#elif RS485_DIR == H1
+#define RS485_DIR_NAME "H1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH1
+#elif RS485_DIR == H2
+#define RS485_DIR_NAME "H2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH2
+#elif RS485_DIR == H3
+#define RS485_DIR_NAME "H3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH3
+#elif RS485_DIR == H4
+#define RS485_DIR_NAME "H4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH4
+#elif RS485_DIR == H5
+#define RS485_DIR_NAME "H5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH5
+#elif RS485_DIR == H6
+#define RS485_DIR_NAME "H6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH6
+#elif RS485_DIR == H7
+#define RS485_DIR_NAME "H7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRH
+#define RS485_DIR_PORT    PORTH
+#define RS485_DIR_PIN     PINH
+#define RS485_DIR	    PINH7
+
+#elif RS485_DIR == J0
+#define RS485_DIR_NAME "J0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ0
+#elif RS485_DIR == J1
+#define RS485_DIR_NAME "J1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ1
+#elif RS485_DIR == J2
+#define RS485_DIR_NAME "J2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ2
+#elif RS485_DIR == J3
+#define RS485_DIR_NAME "J3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ3
+#elif RS485_DIR == J4
+#define RS485_DIR_NAME "J4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ4
+#elif RS485_DIR == J5
+#define RS485_DIR_NAME "J5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ5
+#elif RS485_DIR == J6
+#define RS485_DIR_NAME "J6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ6
+#elif RS485_DIR == J7
+#define RS485_DIR_NAME "J7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRJ
+#define RS485_DIR_PORT    PORTJ
+#define RS485_DIR_PIN     PINJ
+#define RS485_DIR	    PINJ7
+
+#elif RS485_DIR == K0
+#define RS485_DIR_NAME "K0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK0
+#elif RS485_DIR == K1
+#define RS485_DIR_NAME "K1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK1
+#elif RS485_DIR == K2
+#define RS485_DIR_NAME "K2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK2
+#elif RS485_DIR == K3
+#define RS485_DIR_NAME "K3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK3
+#elif RS485_DIR == K4
+#define RS485_DIR_NAME "K4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK4
+#elif RS485_DIR == K5
+#define RS485_DIR_NAME "K5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK5
+#elif RS485_DIR == K6
+#define RS485_DIR_NAME "K6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK6
+#elif RS485_DIR == K7
+#define RS485_DIR_NAME "K7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRK
+#define RS485_DIR_PORT    PORTK
+#define RS485_DIR_PIN     PINK
+#define RS485_DIR	    PINK7
+
+#elif RS485_DIR == L0
+#define RS485_DIR_NAME "L0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL0
+#elif RS485_DIR == L1
+#define RS485_DIR_NAME "L1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL1
+#elif RS485_DIR == L2
+#define RS485_DIR_NAME "L2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL2
+#elif RS485_DIR == L3
+#define RS485_DIR_NAME "L3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL3
+#elif RS485_DIR == L4
+#define RS485_DIR_NAME "L4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL4
+#elif RS485_DIR == L5
+#define RS485_DIR_NAME "L5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL5
+#elif RS485_DIR == L6
+#define RS485_DIR_NAME "L6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL6
+#elif RS485_DIR == L7
+#define RS485_DIR_NAME "L7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRL
+#define RS485_DIR_PORT    PORTL
+#define RS485_DIR_PIN     PINL
+#define RS485_DIR	    PINL7
+
+#elif RS485_DIR == A0
+#define RS485_DIR_NAME "A0"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA0
+#elif RS485_DIR == A1
+#define RS485_DIR_NAME "A1"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA1
+#elif RS485_DIR == A2
+#define RS485_DIR_NAME "A2"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA2
+#elif RS485_DIR == A3
+#define RS485_DIR_NAME "A3"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA3
+#elif RS485_DIR == A4
+#define RS485_DIR_NAME "A4"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA4
+#elif RS485_DIR == A5
+#define RS485_DIR_NAME "A5"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA5
+#elif RS485_DIR == A6
+#define RS485_DIR_NAME "A6"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA6
+#elif RS485_DIR == A7
+#define RS485_DIR_NAME "A7"
+#undef RS485_DIR
+#define RS485_DIR_DDR     DDRA
+#define RS485_DIR_PORT    PORTA
+#define RS485_DIR_PIN     PINA
+#define RS485_DIR	    PINA7
+
+#else
+// Stop compilation right away, so we don't get more errors.
+#if RS485_DIR == -1
+#error Unrecognized RS485_DIR name.  Should be like "B5"
+// Stop compilation right away, so we don't get more errors.
+#pragma GCC diagnostic warning "-Wfatal-errors"
+#error Nonexistent RS485_DIR PORT.  Check datasheet.
+#endif
+#pragma GCC diagnostic warning "-Wfatal-errors"
+#error Unrecognized RS485_DIR name.  Should be like "B5"
+#endif
+
